@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -20,7 +21,7 @@ import (
 // get the service name
 var usersDatabase = sqlx.NewDb(sqldb.Named("users").Stdlib(), "postgres")
 
-// FindByOneField - get user by field
+// FindOneByField - get user by field
 //
 //	@param ctx - context.Context
 //	@param field - string
@@ -43,7 +44,7 @@ func FindOneByField(ctx context.Context, field, ops string, value interface{}) (
 	var user User
 	// execute query
 	if err := database.NamedStructQuery(ctx, usersDatabase, q, data, &user); err != nil {
-		if err == database.ErrNotFound {
+		if errors.Is(err, database.ErrNotFound) {
 			return User{}, ErrNotFound
 		}
 		return User{}, fmt.Errorf("selecting users by ID[%v]: %w", value, err)
@@ -53,7 +54,7 @@ func FindOneByField(ctx context.Context, field, ops string, value interface{}) (
 }
 
 // Create - Create is a function that creates a new user.
-
+//
 // @param ctx - context.Context
 // @param payload
 // @return user
@@ -66,7 +67,6 @@ func Create(ctx context.Context, payload *SignupPayload) (*User, error) {
 	user.Fullname = strings.TrimSpace(payload.Fullname)
 	user.Username = strings.TrimSpace(payload.Username)
 	user.Email = strings.TrimSpace(payload.Email)
-	user.DateOfBirth = payload.DateOfBirth
 	user.Phone = strings.TrimSpace(payload.Phone)
 	user.Roles = []string{middleware.RoleUser, middleware.RoleSuperAdmin}
 
@@ -93,10 +93,10 @@ func Create(ctx context.Context, payload *SignupPayload) (*User, error) {
 	// create query
 	query := `
     INSERT INTO users (
-      id, firstname, lastname, othernames, username, email, date_of_birth, password, phone, role, created_at, updated_at
+      id, firstname, lastname, othernames, username, email, password, phone, role, created_at, updated_at
     ) 
     VALUES (
-      :id, :firstname, :lastname, :othernames, :username, :email, :date_of_birth, :password, :phone, :role, :created_at, :updated_at
+      :id, :firstname, :lastname, :othernames, :username, :email, :password, :phone, :role, :created_at, :updated_at
     )
   `
 	// ON CONFLICT (email) DO NOTHING
@@ -220,7 +220,7 @@ func UpdateRole(ctx context.Context, id string, role string) error {
 	// update user in database
 	if err := database.NamedExecQuery(ctx, usersDatabase, "UPDATE users SET role = :role, updated_at = :updated_at WHERE id = :id", map[string]interface{}{
 		"role":       role,
-		"updated_at": time.Now().UTC(),
+		"updated_at": time.Now(),
 		"id":         user.ID,
 	}); err != nil {
 		return err
@@ -235,7 +235,7 @@ func UpdateRole(ctx context.Context, id string, role string) error {
 //	@return users
 //	@return error
 func GetAll(ctx context.Context, pag *pagination.Options) (*PaginatedUsersResponse, error) {
-	var users []User = []User{}
+	var users []User
 
 	// create query
 	countQuery := `SELECT COUNT(*) FROM users`
@@ -279,20 +279,19 @@ func GetAll(ctx context.Context, pag *pagination.Options) (*PaginatedUsersRespon
 	}
 
 	// create users for response
-	usersResponse := []UserResponse{}
+	usersResponse := make([]UserResponse, 0)
 
 	// loop through users and append to users response
 	for _, user := range users {
 		usersResponse = append(usersResponse, UserResponse{
-			ID:          user.ID,
-			Fullname:    user.Fullname,
-			Username:    user.Username,
-			Email:       user.Email,
-			DateOfBirth: user.DateOfBirth,
-			Phone:       user.Phone,
-			Roles:       user.Roles,
-			CreatedAt:   user.CreatedAt,
-			UpdatedAt:   user.UpdatedAt,
+			ID:        user.ID,
+			Fullname:  user.Fullname,
+			Username:  user.Username,
+			Email:     user.Email,
+			Phone:     user.Phone,
+			Roles:     user.Roles,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
 		})
 	}
 

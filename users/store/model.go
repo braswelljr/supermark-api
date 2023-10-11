@@ -5,33 +5,30 @@ import (
 )
 
 type User struct {
-	ID          string    `json:"id" db:"id"`
-	Fullname    string    `json:"fullname" db:"fullname"`
-	Username    string    `json:"username" db:"username"`
-	Email       string    `json:"email" db:"email"`
-	DateOfBirth string    `json:"dateOfBirth" db:"date_of_birth"`
-	Password    string    `json:"password" db:"password"`
-	Phone       string    `json:"phone" db:"phone"`
-	Roles       []string  `json:"roles" db:"roles"`
-	CreatedAt   time.Time `json:"createdAt" db:"created_at"`
-	UpdatedAt   time.Time `json:"updatedAt" db:"updated_at"`
+	ID        string    `json:"id" db:"id"`
+	Fullname  string    `json:"fullname" db:"fullname"`
+	Username  string    `json:"username" db:"username"`
+	Email     string    `json:"email" db:"email"`
+	Password  string    `json:"password" db:"password"`
+	Phone     string    `json:"phone" db:"phone"`
+	Roles     []string  `json:"roles" db:"roles"`
+	CreatedAt time.Time `json:"createdAt" db:"created_at"`
+	UpdatedAt time.Time `json:"updatedAt" db:"updated_at"`
 }
 
 type SignupPayload struct {
-	Fullname    string `json:"fullname" validate:"required"`         // required
-	Username    string `json:"username" validate:"required"`         // required
-	DateOfBirth string `json:"dateOfBirth" validate:"omitempty"`     // optional
-	Email       string `json:"email" validate:"required,email"`      // required
-	Password    string `json:"password" validate:"required" min:"8"` // required
-	Phone       string `json:"phone" validate:"required"`            // required
+	Fullname string `json:"fullname" validate:"required"`         // required
+	Username string `json:"username" validate:"required"`         // required
+	Email    string `json:"email" validate:"required,email"`      // required
+	Password string `json:"password" validate:"required" min:"8"` // required
+	Phone    string `json:"phone" validate:"required"`            // required
 }
 
 type UpdatePayload struct {
-	Fullname    string `json:"fullname" db:"fullname" validate:"omitempty"`       // not required
-	Username    string `json:"username" db:"username" validate:"omitempty"`       // not required
-	DateOfBirth string `json:"dateOfBirth" db:"dateOfBirth" validate:"omitempty"` // not required
-	Email       string `json:"email" db:"email" validate:"omitempty,email"`       // not required
-	Phone       string `json:"phone" db:"phone" validate:"omitempty"`             // not required
+	Fullname string `json:"fullname" db:"fullname" validate:"omitempty"` // not required
+	Username string `json:"username" db:"username" validate:"omitempty"` // not required
+	Email    string `json:"email" db:"email" validate:"omitempty,email"` // not required
+	Phone    string `json:"phone" db:"phone" validate:"omitempty"`       // not required
 }
 
 type UpdateRolePayload struct {
@@ -39,15 +36,14 @@ type UpdateRolePayload struct {
 }
 
 type UserResponse struct {
-	ID          string    `json:"id" db:"id"`
-	Fullname    string    `json:"fullname" db:"fullname"`
-	Username    string    `json:"username" db:"username"`
-	DateOfBirth string    `json:"dateOfBirth" db:"dateOfBirth"`
-	Email       string    `json:"email" db:"email"`
-	Phone       string    `json:"phone" db:"phone"`
-	Roles       []string  `json:"roles" db:"roles"`
-	CreatedAt   time.Time `json:"createdAt" db:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt" db:"updatedAt"`
+	ID        string    `json:"id" db:"id"`
+	Fullname  string    `json:"fullname" db:"fullname"`
+	Username  string    `json:"username" db:"username"`
+	Email     string    `json:"email" db:"email"`
+	Phone     string    `json:"phone" db:"phone"`
+	Roles     []string  `json:"roles" db:"roles"`
+	CreatedAt time.Time `json:"createdAt" db:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt" db:"updatedAt"`
 }
 
 type PaginatedUsersResponse struct {
@@ -63,4 +59,16 @@ type UserUpdateResponse struct {
 
 type DeleteUserEvent struct {
 	ID string `json:"id" db:"id"`
+}
+
+type LoginPayload struct {
+	Email    string `json:"email" validate:"required,email"` // required
+	Password string `json:"password" validate:"required"`    // required
+}
+
+type Response struct {
+	Message string        `json:"message"`
+	Code    int           `json:"code"`
+	Token   string        `json:"token"`
+	Payload *UserResponse `json:"payload"`
 }
