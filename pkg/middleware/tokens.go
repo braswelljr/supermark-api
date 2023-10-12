@@ -54,7 +54,7 @@ func ValidateToken(token string) (*SignedParams, error) {
 
 // GetTokens - is a function that handles the retrieval of tokens.
 //
-//	@param user - *store.User
+//	@param user - *ps.User
 //	@return string
 //	@return string
 //	@return error

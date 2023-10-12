@@ -11,8 +11,8 @@ type DataI struct {
 }
 
 type User struct {
-	ID          string
-	Fullname    string
+	Id          string
+	Name        string
 	Username    string
 	Email       string
 	DateOfBirth string

@@ -1,11 +1,13 @@
 package slice
 
-import "strings"
-
-// Contains return true/false if an element is in a slice or not
-func Contains(slice []string, val string) bool {
+// Contains - return true/false if an element is in a slice or not
+//
+//	@param slice - slice to check
+//	@param value - value to check for
+//	@return bool - true/false
+func Contains[T comparable](slice []T, value T) bool {
 	for _, item := range slice {
-		if strings.EqualFold(item, val) {
+		if item == value {
 			return true
 		}
 	}
@@ -13,6 +15,10 @@ func Contains(slice []string, val string) bool {
 }
 
 // Remove element by value from slice
+//
+//	@param l - slice to remove from
+//	@param item - item to remove
+//	@return []T - slice without the item
 func Remove[T comparable](l []T, item T) []T {
 	for i, ele := range l {
 		if ele == item {

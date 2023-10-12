@@ -5,43 +5,46 @@ import (
 )
 
 type User struct {
-	ID        string    `json:"id" db:"id"`
-	Fullname  string    `json:"fullname" db:"fullname"`
+	Id        string    `json:"id" db:"id"`
+	Name      string    `json:"name" db:"name"`
 	Username  string    `json:"username" db:"username"`
 	Email     string    `json:"email" db:"email"`
 	Password  string    `json:"password" db:"password"`
 	Phone     string    `json:"phone" db:"phone"`
 	Roles     []string  `json:"roles" db:"roles"`
+	Avatar    string    `json:"avatar" db:"avatar"`
 	CreatedAt time.Time `json:"createdAt" db:"created_at"`
 	UpdatedAt time.Time `json:"updatedAt" db:"updated_at"`
 }
 
 type SignupPayload struct {
-	Fullname string `json:"fullname" validate:"required"`         // required
+	Name     string `json:"name" validate:"required"`             // required
 	Username string `json:"username" validate:"required"`         // required
 	Email    string `json:"email" validate:"required,email"`      // required
-	Password string `json:"password" validate:"required" min:"8"` // required
 	Phone    string `json:"phone" validate:"required"`            // required
+	Password string `json:"password" validate:"required" min:"8"` // required
 }
 
 type UpdatePayload struct {
-	Fullname string `json:"fullname" db:"fullname" validate:"omitempty"` // not required
+	Name     string `json:"name" db:"name" validate:"omitempty"`         // not required
 	Username string `json:"username" db:"username" validate:"omitempty"` // not required
 	Email    string `json:"email" db:"email" validate:"omitempty,email"` // not required
 	Phone    string `json:"phone" db:"phone" validate:"omitempty"`       // not required
+	Avatar   string `json:"avatar" db:"avatar" validate:"omitempty"`     // not required
 }
 
 type UpdateRolePayload struct {
-	ID string `json:"id" db:"id" validate:"required"` // required
+	Id string `json:"id" db:"id" validate:"required"` // required
 }
 
 type UserResponse struct {
-	ID        string    `json:"id" db:"id"`
-	Fullname  string    `json:"fullname" db:"fullname"`
+	Id        string    `json:"id" db:"id"`
+	Name      string    `json:"name" db:"name"`
 	Username  string    `json:"username" db:"username"`
 	Email     string    `json:"email" db:"email"`
 	Phone     string    `json:"phone" db:"phone"`
 	Roles     []string  `json:"roles" db:"roles"`
+	Avatar    string    `json:"avatar" db:"avatar"`
 	CreatedAt time.Time `json:"createdAt" db:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt" db:"updatedAt"`
 }
@@ -58,7 +61,7 @@ type UserUpdateResponse struct {
 }
 
 type DeleteUserEvent struct {
-	ID string `json:"id" db:"id"`
+	Id string `json:"id" db:"id"`
 }
 
 type LoginPayload struct {

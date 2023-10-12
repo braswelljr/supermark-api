@@ -15,3 +15,15 @@ git clone https://github.com/braswelljr/supermark-api.git
 ```bash
 cd supermark-api
 ```
+
+- INSTALL DEPENDENCIES
+
+```bash
+go mod download
+```
+
+- RUN THE APPLICATION
+
+```bash
+encore dev
+```

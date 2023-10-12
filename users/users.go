@@ -39,8 +39,8 @@ func Signup(ctx context.Context, payload *store.SignupPayload) (*store.Response,
 
 	// generate tokens
 	token, err := middleware.GetToken(&middleware.User{
-		ID:       user.ID,
-		Fullname: user.Fullname,
+		ID:       user.Id,
+		Name:     user.Name,
 		Username: user.Username,
 		Email:    user.Email,
 		Phone:    user.Phone,
@@ -55,8 +55,8 @@ func Signup(ctx context.Context, payload *store.SignupPayload) (*store.Response,
 		Message: "Signup successful",
 		Token:   token,
 		Payload: &store.UserResponse{
-			ID:        user.ID,
-			Fullname:  user.Fullname,
+			Id:        user.Id,
+			Name:      user.Name,
 			Username:  user.Username,
 			Email:     user.Email,
 			Phone:     user.Phone,
@@ -105,8 +105,8 @@ func Login(w http.ResponseWriter, req *http.Request) {
 
 	// Generate tokens
 	token, err := middleware.GetToken(&middleware.User{
-		ID:       user.ID,
-		Fullname: user.Fullname,
+		Id:       user.Id,
+		Name:     user.Name,
 		Username: user.Username,
 		Email:    user.Email,
 		Phone:    user.Phone,
@@ -122,8 +122,8 @@ func Login(w http.ResponseWriter, req *http.Request) {
 		Message: "Login successful",
 		Token:   token,
 		Payload: &store.UserResponse{
-			ID:        user.ID,
-			Fullname:  user.Fullname,
+			Id:        user.Id,
+			Name:      user.Name,
 			Username:  user.Username,
 			Email:     user.Email,
 			Phone:     user.Phone,
@@ -233,7 +233,7 @@ func Get(ctx context.Context, id string) (*store.User, error) {
 	}
 
 	// check for the roles
-	if !claims.HasRole(middleware.RoleSuperAdmin, middleware.RoleAdmin) || claims.Subject.ID != id {
+	if !claims.HasRole(middleware.RoleSuperAdmin, middleware.RoleAdmin) || claims.Subject.Id != id {
 		return &store.User{}, fmt.Errorf("unauthorized: you are not authorized to perform this action")
 	}
 
@@ -262,7 +262,7 @@ func Delete(ctx context.Context, id string) error {
 	}
 
 	// check for the roles
-	if !claims.HasRole(middleware.RoleSuperAdmin) || claims.Subject.ID != id {
+	if !claims.HasRole(middleware.RoleSuperAdmin) || claims.Subject.Id != id {
 		return fmt.Errorf("unauthorized: you are not authorized to perform this action")
 	}
 
@@ -291,7 +291,7 @@ func Update(ctx context.Context, id string, payload store.UpdatePayload) (*store
 	}
 
 	// check if the user is authorized to perform this action
-	if claims.Subject.ID != id {
+	if claims.Subject.Id != id {
 		return &store.UserUpdateResponse{}, fmt.Errorf("unauthorized: you are not authorized to perform this action")
 	}
 
@@ -318,7 +318,7 @@ func Update(ctx context.Context, id string, payload store.UpdatePayload) (*store
 //	@return user
 //	@return error
 //
-// encore:api auth method=PATCH path=/users/update/:id/role-to-admin
+// encore:api auth method=PATCH path=/users/update/:id/toggle-admin
 func UpdateRole(ctx context.Context, id string) error {
 	// check if user is admin or superadmin
 	claims, err := middleware.GetVerifiedClaims(ctx, "")
@@ -332,7 +332,7 @@ func UpdateRole(ctx context.Context, id string) error {
 	}
 
 	// update user
-	if err := store.UpdateRole(ctx, id, middleware.RoleAdmin); err != nil {
+	if err := store.UpdateRole(ctx, id); err != nil {
 		return err
 	}
 

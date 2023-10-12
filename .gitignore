@@ -16,3 +16,6 @@ encore.gen.cue
 .idea/
 *.swp
 *.swo
+
+# Readme
+PROBLEM.md

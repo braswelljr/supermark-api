@@ -63,8 +63,8 @@ func Create(ctx context.Context, payload *SignupPayload) (*User, error) {
 	// create user from payload
 	user := User{}
 
-	user.ID = uuid.New().String()
-	user.Fullname = strings.TrimSpace(payload.Fullname)
+	user.Id = uuid.New().String()
+	user.Name = strings.TrimSpace(payload.Name)
 	user.Username = strings.TrimSpace(payload.Username)
 	user.Email = strings.TrimSpace(payload.Email)
 	user.Phone = strings.TrimSpace(payload.Phone)
@@ -108,7 +108,7 @@ func Create(ctx context.Context, payload *SignupPayload) (*User, error) {
 	}
 
 	// query user from database
-	usr, err := FindOneByField(ctx, "id", "=", user.ID)
+	usr, err := FindOneByField(ctx, "id", "=", user.Id)
 	if err != nil {
 		return &User{}, err
 	}
@@ -185,7 +185,7 @@ func Update(ctx context.Context, id string, payload UpdatePayload) error {
 	var ks []string
 
 	fields["updated_at"] = time.Now().UTC()
-	fields["id"] = user.ID
+	fields["id"] = user.Id
 
 	// loop through fields and create query fields
 	for k := range fields {
@@ -210,18 +210,33 @@ func Update(ctx context.Context, id string, payload UpdatePayload) error {
 //	@param role
 //	@return user
 //	@return error
-func UpdateRole(ctx context.Context, id string, role string) error {
+func UpdateRole(ctx context.Context, id string) error {
 	// query user from database
 	user, err := GetWithID(ctx, id)
 	if err != nil {
 		return err
 	}
 
+	// make sure super admin rights are not given or return if user is a super admin
+	if slice.Contains(user.Roles, middleware.RoleSuperAdmin) {
+		return errors.New("cannot update user role")
+	}
+
+	// roles to be updated
+	var roles []string
+
+	// add admin role to roles if it does not exist in user.Roles and remove it if it does to role before updating
+	if slice.Contains(user.Roles, middleware.RoleAdmin) {
+		roles = slice.Remove(roles, middleware.RoleAdmin)
+	} else {
+		roles = append(roles, middleware.RoleAdmin)
+	}
+
 	// update user in database
-	if err := database.NamedExecQuery(ctx, usersDatabase, "UPDATE users SET role = :role, updated_at = :updated_at WHERE id = :id", map[string]interface{}{
-		"role":       role,
+	if err := database.NamedExecQuery(ctx, usersDatabase, "UPDATE users SET roles = :roles, updated_at = :updated_at WHERE id = :id", map[string]interface{}{
+		"roles":      roles,
 		"updated_at": time.Now(),
-		"id":         user.ID,
+		"id":         user.Id,
 	}); err != nil {
 		return err
 	}
@@ -249,7 +264,7 @@ func GetAll(ctx context.Context, pag *pagination.Options) (*PaginatedUsersRespon
 
 	// set limit to 20 if it is less than 0 or greater than count
 	if pag.Limit < 1 || pag.Limit > count {
-		pag.Limit = 20
+		pag.Limit = 50
 	}
 
 	// calculate for pagination
@@ -284,8 +299,8 @@ func GetAll(ctx context.Context, pag *pagination.Options) (*PaginatedUsersRespon
 	// loop through users and append to users response
 	for _, user := range users {
 		usersResponse = append(usersResponse, UserResponse{
-			ID:        user.ID,
-			Fullname:  user.Fullname,
+			Id:        user.Id,
+			Name:      user.Name,
 			Username:  user.Username,
 			Email:     user.Email,
 			Phone:     user.Phone,
@@ -322,7 +337,7 @@ func Delete(ctx context.Context, id string) error {
 
 	// delete user from database
 	if err := database.NamedExecQuery(ctx, usersDatabase, "DELETE FROM users WHERE id = :id", map[string]interface{}{
-		"id": user.ID,
+		"id": user.Id,
 	}); err != nil {
 		return err
 	}
