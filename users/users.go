@@ -39,7 +39,7 @@ func Signup(ctx context.Context, payload *store.SignupPayload) (*store.Response,
 
 	// generate tokens
 	token, err := middleware.GetToken(&middleware.User{
-		ID:       user.Id,
+		Id:       user.Id,
 		Name:     user.Name,
 		Username: user.Username,
 		Email:    user.Email,
@@ -378,7 +378,7 @@ func Auth(_ context.Context, token string) (auth.UID, *middleware.DataI, error) 
 		return "", &middleware.DataI{}, errors.New("authentication failed: invalid token")
 	}
 
-	return auth.UID(claims.User.ID), &middleware.DataI{
+	return auth.UID(claims.User.Id), &middleware.DataI{
 		Subject: claims.User,
 		Roles:   claims.User.Roles,
 	}, nil

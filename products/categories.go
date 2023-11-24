@@ -20,7 +20,7 @@ import (
 //	 @return error
 //
 // encore:api auth method=POST path=/categories/create
-func CreateCategory(ctx context.Context, uid string, payload *cs.CategoryRequest) error {
+func CreateCategory(ctx context.Context, payload *cs.CategoryRequest) error {
 	// check for claims
 	claims, err := middleware.GetVerifiedClaims(ctx, "")
 	if err != nil {
@@ -38,7 +38,7 @@ func CreateCategory(ctx context.Context, uid string, payload *cs.CategoryRequest
 	}
 
 	// create category
-	if err := cs.Create(ctx, uid, payload); err != nil {
+	if err := cs.Create(ctx, payload); err != nil {
 		return err
 	}
 

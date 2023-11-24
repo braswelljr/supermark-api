@@ -2,12 +2,13 @@ package cs
 
 import (
 	"context"
-	"encore.app/pkg/pagination"
 	"errors"
 	"fmt"
 	"reflect"
 	"strings"
 	"time"
+
+	"encore.app/pkg/pagination"
 
 	"encore.dev/storage/sqldb"
 	"github.com/google/uuid"
@@ -88,7 +89,7 @@ func FindManyByField(ctx context.Context, field, ops string, value interface{}) 
 //	@param ctx - context.Context
 //	@param payload - *CreateCategoryPayload
 //	@return error
-func Create(ctx context.Context, uid string, payload *CategoryRequest) error {
+func Create(ctx context.Context, payload *CategoryRequest) error {
 	// check if category already exists
 	cat, err := FindOneByField(ctx, "name", "=", strings.ToLower(payload.Name))
 	if err == nil {
@@ -241,7 +242,7 @@ func Update(ctx context.Context, id string, payload *UpdateCategoryRequest) erro
 	}
 
 	// query statement to be executed
-	q := fmt.Sprintf("UPDATE categories SET %v WHERE id = :id RETURNING *", strings.Join(ks, ", "), category.Id)
+	q := fmt.Sprintf("UPDATE categories SET %v WHERE id = :%v RETURNING *", strings.Join(ks, ", "), category.Id)
 
 	// execute query
 	if err := database.NamedExecQuery(ctx, categoriesDatabase, q, fields); err != nil {
@@ -299,14 +300,6 @@ func GetAll(ctx context.Context, pag *pagination.Options) (*PaginatedCategoriesR
 	// execute query
 	if err := database.NamedSliceQuery(ctx, categoriesDatabase, query, p, &categories); err != nil {
 		return nil, fmt.Errorf("getting categories: %w", err)
-	}
-
-	// create users for response
-	cats := make([]Category, 0)
-
-	// loop through users and append to users response
-	for _, category := range categories {
-		cats = append(cats, category)
 	}
 
 	return &PaginatedCategoriesResponse{

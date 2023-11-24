@@ -67,7 +67,7 @@ func GetToken(user *User) (string, error) {
 		User: user,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    ContextKey.(string),
-			Subject:   user.ID,
+			Subject:   user.Id,
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
 		},
 		Roles: user.Roles,
