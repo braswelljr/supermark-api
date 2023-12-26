@@ -17,7 +17,7 @@ import (
 //	@return error
 //
 // encore:api auth method=GET path=/products/:id
-func Get(ctx context.Context, _ string) (*ps.Product, error) {
+func Get(ctx context.Context, id string) (*ps.Product, error) {
 	// check for claims
 	claims, err := middleware.GetVerifiedClaims(ctx, "")
 	if err != nil {
