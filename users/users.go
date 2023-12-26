@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"encore.dev/beta/auth"
+	"encore.dev/beta/errs"
 	"github.com/go-playground/validator/v10"
 
 	"encore.app/pkg/middleware"
@@ -34,7 +35,10 @@ func Signup(ctx context.Context, payload *store.SignupPayload) (*store.Response,
 	// create a new user
 	user, err := Create(ctx, payload)
 	if err != nil {
-		return nil, err
+		return nil, &errs.Error{
+			Code:    errs.Internal,
+			Message: "authentication failed: could not signup user",
+		}
 	}
 
 	// generate tokens
@@ -47,7 +51,11 @@ func Signup(ctx context.Context, payload *store.SignupPayload) (*store.Response,
 		Roles:    user.Roles,
 	})
 	if err != nil {
-		return &store.Response{}, errors.New("authentication failed: unable to generate token")
+		// return &store.Response{}, errors.New("authentication failed: unable to generate token")
+		return &store.Response{}, &errs.Error{
+			Code:    errs.Unauthenticated,
+			Message: "authentication failed: unable to generate token",
+		}
 	}
 
 	// return the response
@@ -182,7 +190,10 @@ func Create(ctx context.Context, payload *store.SignupPayload) (*store.User, err
 	// create user
 	user, err := store.Create(ctx, payload)
 	if err != nil {
-		return nil, err
+		return nil, &errs.Error{
+			Code:    errs.Internal,
+			Message: "authentication failed: could not signup user",
+		}
 	}
 
 	return user, nil
@@ -229,18 +240,28 @@ func Get(ctx context.Context, id string) (*store.User, error) {
 	// check for claims
 	claims, err := middleware.GetVerifiedClaims(ctx, "")
 	if err != nil {
-		return &store.User{}, err
+		return &store.User{}, &errs.Error{
+			Code:    errs.Unauthenticated,
+			Message: "unauthorized: unable to verify user details",
+		}
 	}
 
 	// check for the roles
 	if !claims.HasRole(middleware.RoleSuperAdmin, middleware.RoleAdmin) || claims.Subject.Id != id {
-		return &store.User{}, fmt.Errorf("unauthorized: you are not authorized to perform this action")
+		// return &store.User{}, fmt.Errorf("unauthorized: you are not authorized to perform this action")
+		return &store.User{}, &errs.Error{
+			Code:    errs.Unauthenticated,
+			Message: "unauthorized: you are not authorized to perform this action",
+		}
 	}
 
 	// get user
 	user, err := store.GetWithID(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, &errs.Error{
+			Code:    errs.NotFound,
+			Message: "unauthorized: you are not authorized to perform this action",
+		}
 	}
 
 	// return user

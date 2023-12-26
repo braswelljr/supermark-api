@@ -2,10 +2,12 @@ package pagination
 
 // PaginatedResults - paginated results
 type PaginatedResults struct {
-	Data  []interface{} `json:"data" db:"data"`
-	Page  int           `json:"page" db:"page"`
-	Limit int           `json:"limit" db:"limit"`
-	Total int           `json:"total" db:"total"`
+	Data            []interface{} `json:"data" db:"data"`
+	Page            int           `json:"page" db:"page"`
+	Limit           int           `json:"limit" db:"limit"`
+	Total           int           `json:"total" db:"total"`
+	HasPreviousPage bool          `json:"hasPreviousPage" db:"hasPreviousPage"`
+	HasNextPage     bool          `json:"hasNextPage" db:"hasNextPage"`
 }
 
 // Query - query
@@ -23,10 +25,12 @@ type Options struct {
 
 // PaginationResponse - pagination
 type PaginationResponse struct {
-	Offset      int `json:"offset" db:"offset"`  // where to start from
-	Limit       int `json:"limit" db:"limit"`    // the number of items
-	Total       int `json:"total" total:"total"` // total number of items
-	CurrentPage int `json:"page" db:"page"`      // the current page
+	Offset          int  `json:"offset" db:"offset"`  // where to start from
+	Limit           int  `json:"limit" db:"limit"`    // the number of items
+	Total           int  `json:"total" total:"total"` // total number of items
+	CurrentPage     int  `json:"page" db:"page"`      // the current page
+	HasPreviousPage bool `json:"hasPreviousPage" db:"hasPreviousPage"`
+	HasNextPage     bool `json:"hasNextPage" db:"hasNextPage"`
 }
 
 // Pagination represents a pagination.

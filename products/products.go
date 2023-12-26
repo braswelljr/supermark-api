@@ -2,7 +2,8 @@ package products
 
 import (
 	"context"
-	"fmt"
+
+	"encore.dev/beta/errs"
 
 	"encore.app/pkg/middleware"
 	"encore.app/products/ps"
@@ -16,7 +17,7 @@ import (
 //	@return error
 //
 // encore:api auth method=GET path=/products/:id
-func Get(ctx context.Context, id string) (*ps.Product, error) {
+func Get(ctx context.Context, _ string) (*ps.Product, error) {
 	// check for claims
 	claims, err := middleware.GetVerifiedClaims(ctx, "")
 	if err != nil {
@@ -25,8 +26,14 @@ func Get(ctx context.Context, id string) (*ps.Product, error) {
 
 	// check for the roles
 	if !claims.HasRole(middleware.RoleSuperAdmin, middleware.RoleAdmin) {
-		return &ps.Product{}, fmt.Errorf("unauthorized: you are not authorized to perform this action")
+		// return &ps.Product{}, fmt.Errorf("unauthorized: you are not authorized to perform this action")
+		return &ps.Product{}, &errs.Error{
+			Code:    errs.Unauthenticated,
+			Message: "unauthorized: you are not authorized to perform this action",
+		}
 	}
+
+	// get the product from
 
 	// return user
 	return &ps.Product{}, nil

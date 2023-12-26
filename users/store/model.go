@@ -50,10 +50,12 @@ type UserResponse struct {
 }
 
 type PaginatedUsersResponse struct {
-	Users       []UserResponse `json:"data"`
-	Total       int            `json:"total" db:"total"`
-	TotalPages  int            `json:"totalPages" db:"totalPages"`
-	CurrentPage int            `json:"currentPage" db:"currentPage"`
+	Users           []UserResponse `json:"data"`
+	Total           int            `json:"total" db:"total"`
+	TotalPages      int            `json:"totalPages" db:"totalPages"`
+	CurrentPage     int            `json:"currentPage" db:"currentPage"`
+	HasPreviousPage bool           `json:"hasPreviousPage" db:"hasPreviousPage"`
+	HasNextPage     bool           `json:"hasNextPage" db:"hasNextPage"`
 }
 
 type UserUpdateResponse struct {

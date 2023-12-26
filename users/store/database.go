@@ -311,10 +311,12 @@ func GetAll(ctx context.Context, pag *pagination.Options) (*PaginatedUsersRespon
 	}
 
 	return &PaginatedUsersResponse{
-		TotalPages:  paging.Pages(),
-		Total:       paging.Total(),
-		CurrentPage: paging.Page(),
-		Users:       usersResponse,
+		TotalPages:      paging.Pages(),
+		Total:           paging.Total(),
+		CurrentPage:     paging.Page(),
+		HasPreviousPage: paging.HasPrevious(),
+		HasNextPage:     paging.HasNext(),
+		Users:           usersResponse,
 	}, nil
 }
 
